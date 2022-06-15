@@ -87,7 +87,7 @@ pub(crate) fn resource_quotas_from_str(full_string: &str) -> Result<Vec<Resource
         } else if let Some(stripped) = token.strip_prefix(ROLE_ASSIGNMENTS) {
             v.push(ResourceQuota::RoleAssignments(parseu64(stripped)?));
         } else {
-            return Err(Error::with_message(ErrorKind::DataConversion, || {
+            log::warn!("{}", Error::with_message(ErrorKind::DataConversion, || {
                 format!(
                     "resource quota has an unrecognized part - part: \"{}\" full string: \"{}\"",
                     token, full_string
