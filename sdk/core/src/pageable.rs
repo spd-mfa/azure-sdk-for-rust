@@ -22,18 +22,29 @@ macro_rules! r#try {
 #[pin_project]
 pub struct Pageable<T, E> {
     #[pin]
-    stream: std::pin::Pin<Box<dyn Stream<Item = Result<T, E>> + Send>>,
+    stream: std::pin::Pin<Box<dyn Stream<Item=Result<T, E>> + Send>>,
 }
 
 impl<T, E> Pageable<T, E>
-where
-    T: Continuable + Send + Sync,
+    where
+        T: Continuable + Send + Sync,
 {
     pub fn new<F>(make_request: impl Fn(Option<Continuation>) -> F + Clone + 'static + Send) -> Self
-    where
-        F: std::future::Future<Output = Result<T, E>> + Send + 'static,
+        where F: std::future::Future<Output=Result<T, E>> + Send + 'static,
     {
-        let stream = unfold(State::Init, move |state: State| {
+        Pageable::<T, E>::new_continuation(make_request, None)
+    }
+
+    pub fn new_continuation<F>(
+        make_request: impl Fn(Option<Continuation>) -> F + Clone + 'static + Send,
+        continuation: Option<Continuation>) -> Self
+        where F: std::future::Future<Output=Result<T, E>> + Send + 'static,
+    {
+        let state = match continuation {
+            None => State::Init,
+            Some(continuation) => State::Continuation(continuation.into_raw()),
+        };
+        let stream = unfold(state, move |state: State| {
             let make_request = make_request.clone();
             async move {
                 let response = match state {
