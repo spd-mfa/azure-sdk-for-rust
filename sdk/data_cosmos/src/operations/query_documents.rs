@@ -68,8 +68,15 @@ impl QueryDocumentsBuilder {
     }
 
     pub fn into_stream<T>(self) -> QueryDocuments<T>
-    where
-        T: DeserializeOwned + Send + Sync,
+        where
+            T: DeserializeOwned + Send + Sync,
+    {
+        self.into_stream_continuation(None)
+    }
+
+    pub fn into_stream_continuation<T>(self, continuation: Option<Continuation>) -> QueryDocuments<T>
+        where
+            T: DeserializeOwned + Send + Sync,
     {
         let make_request = move |continuation: Option<Continuation>| {
             let this = self.clone();
@@ -123,7 +130,7 @@ impl QueryDocumentsBuilder {
             }
         };
 
-        Pageable::new(make_request)
+        Pageable::new_continuation(make_request, continuation)
     }
 }
 
@@ -138,8 +145,8 @@ pub struct DocumentQueryResult<T> {
 }
 
 impl<T> std::convert::TryFrom<Response<bytes::Bytes>> for DocumentQueryResult<T>
-where
-    T: DeserializeOwned,
+    where
+        T: DeserializeOwned,
 {
     type Error = azure_core::error::Error;
 
@@ -212,8 +219,8 @@ impl<T> QueryDocumentsResponse<T> {
 }
 
 impl<T> QueryDocumentsResponse<T>
-where
-    T: DeserializeOwned,
+    where
+        T: DeserializeOwned,
 {
     pub async fn try_from(response: HttpResponse) -> azure_core::error::Result<Self> {
         let (_status_code, headers, pinned_stream) = response.deconstruct();
@@ -395,7 +402,7 @@ impl<T> std::convert::TryFrom<QueryDocumentsResponse<T>> for QueryDocumentsRespo
                         // Bail if there is a raw document
                         Err(azure_core::error::Error::message(
                             azure_core::error::ErrorKind::DataConversion,
-                            "error when converting from a QueryDocumentsResponse to structured documents - expected no raw documents but a raw document was found."
+                            "error when converting from a QueryDocumentsResponse to structured documents - expected no raw documents but a raw document was found.",
                         ))
                     }
                 })
@@ -427,6 +434,7 @@ impl<T> std::convert::TryFrom<QueryDocumentsResponse<T>> for QueryDocumentsRespo
         })
     }
 }
+
 impl<T> Continuable for QueryDocumentsResponse<T> {
     fn continuation(&self) -> Option<String> {
         self.continuation_token.clone()
