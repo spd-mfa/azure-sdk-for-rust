@@ -36,7 +36,7 @@ sha2 = "0.10"
 tokio = { version = "1.0", features = ["macros"] }
 env_logger = "0.9"
 azure_identity = { path = "../identity" }
-reqwest = "0.11"
+reqwest = "0.12"
 
 [features]
 default = ["account", "enable_reqwest"]
