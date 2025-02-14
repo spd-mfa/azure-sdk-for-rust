@@ -11,7 +11,7 @@ env:
 jobs:
   fmt:
     name: Code Style
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -39,7 +39,7 @@ jobs:
 
   test-sdk:
     name: SDK Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -78,7 +78,7 @@ jobs:
 
   test-services:
     name: Services Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       RUSTFLAGS: -Dwarnings -Aunreachable-code -Aunused-assignments -Adead-code -Aclippy::new-without-default -Aclippy::unnecessary_to_owned
     steps:
@@ -110,7 +110,7 @@ jobs:
 
   test-integration:
     name: Integration Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -134,7 +134,7 @@ jobs:
 
   test-e2e:
     name: E2E Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -161,7 +161,7 @@ jobs:
 
   test-autorust:
     name: test AutoRust
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: git clone
         uses: actions/checkout@v2
